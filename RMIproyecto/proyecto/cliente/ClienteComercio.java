@@ -4,13 +4,13 @@ import java.rmi.*;
 import java.rmi.server.*;
 
 
-class Cliente {
+class ClienteComercio {
     static public void main (String args[]) {
 	int flag = 1;
 	List <Producto> catalogo;
 	
         if (args.length!=3) {
-            System.err.println("Uso: Cliente hostregistro numPuertoRegistro Usuario");
+            System.err.println("Uso: ClienteComercio hostregistro numPuertoRegistro Usuario");
             return;
         }
 
@@ -55,7 +55,7 @@ class Cliente {
             System.err.println("Error de comunicacion: " + e.toString());
         }
         catch (Exception e) {
-            System.err.println("Excepcion en ClienteBanco:");
+            System.err.println("Excepcion en ClienteComercio:");
             e.printStackTrace();
         }
     }
