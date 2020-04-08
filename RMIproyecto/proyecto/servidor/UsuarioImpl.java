@@ -7,7 +7,7 @@ class UsuarioImpl extends UnicastRemoteObject implements Usuario {
     UsuarioImpl(String n) throws RemoteException {
         nombre = n;
     }
-    public String obtenerNombre() throws RemoteException {
+   /* public String obtenerNombre() throws RemoteException {
         return nombre;
     }
     public float obtenerSaldo() throws RemoteException {
@@ -16,5 +16,5 @@ class UsuarioImpl extends UnicastRemoteObject implements Usuario {
     public float operacion(float valor) throws RemoteException {
         saldo += valor;
         return saldo;
-    }
+    } */
 }
