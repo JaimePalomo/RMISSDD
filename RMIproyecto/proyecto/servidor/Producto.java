@@ -1,26 +1,34 @@
-
+import.java.util.*;
 import java.io.*;
 import java.lang.*;
 
 class Producto implements Serializable {
-     private String nombre;
-     private String id;
-     private String precio; 
-	public Producto(String nombre, String id, String precio)
+	private String nombre;
+	private int id;
+	private float precio; 
+	public Producto(String nombre, int id, float precio)
 	{
 		this.nombre=nombre;
 		this.id=id;
 		this.precio=precio;
 	}
-     	public static void getProducto() {
-        	;
+     	public String obtenerNombre() {
+        	return this.nombre;
      	}
-	public void cambiarContraseña(String nueva) {
-		this.contraseña = nueva;
-		
-	}
-	public String añadirSaldo(float valor) {
-		float saldo_actual=valueOf(this.saldo);
-        	this.saldo=toString(saldo_actual + valor);
-        	return this.saldo;
-    	}
+	public int obtenerId() {
+        	return this.id;
+     	}
+	public float obtenerPrecio() {
+        	return this.precio;
+     	}
+    	public void cambiarPrecio(float valor) {
+        	this.precio=valor;
+     	}
+	public void cambiarNombre(String nombre_nuevo) {
+        	this.nombre=nombre_nuevo;
+     	}
+	public void cambiarId(String id_nuevo) {
+        	this.id=id_nuevo;
+     	}
+    	
+}

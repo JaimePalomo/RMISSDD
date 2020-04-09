@@ -3,31 +3,53 @@ import java.io.*;
 import java.lang.*;
 
 class Usuario implements Serializable {
-     private String nombre;
-     private String contraseña;
-     private String saldo; 
-	public Usuario(String nombre, String contraseña, String saldo)
+	private String nombre;
+	private String contraseña;
+	private float saldo; 
+	private String direccion;
+	List <Pedido> Pedidos;
+	private boolean admin;
+	public Usuario(String nombre, String contraseña, float saldo, String direccion, List <Pedido> Pedidos, boolean admin)
 	{
 		this.nombre=nombre;
 		this.contraseña=contraseña;
 		this.saldo=saldo;
+		this.direccion=direccion;
+		this.Pedidos=Pedidos;
+		this.admin=admin;
 	}
-     	public String obtenerSaldo() {
+	public String obtenerNombre() {
+        	 return this.nombre;
+     	}
+	public String obtenerContraseña() {
+        	 return this.contraseña;
+     	}
+	public String obtenerDireccion() {
+        	 return this.direccion;
+     	}
+     	public float obtenerSaldo() {
         	 return this.saldo;
      	}
-	public void cambiarContraseña(String nueva) {
-		this.contraseña = nueva;
-		
+	public boolean isAdmin() {
+		return this.admin;	
 	}
-	public String añadirSaldo(float valor) {
-		float saldo_actual=valueOf(this.saldo);
-        	this.saldo=toString(saldo_actual + valor);
+	public List<Pedido> obtenerPedidos() {
+        	 return this.Pedidos;
+     	}
+	public void cambiarNombre(String nuevo) {
+		this.nombre = nuevo;	
+	}
+	public void cambiarContraseña(String nueva) {
+		this.contraseña = nueva;	
+	}
+	public void cambiarDireccion(String nueva) {
+		this.direccion = nueva;	
+	}
+	public void hacerAdmin(boolean admin_nuevo){
+		this.admin=admin_nuevo;	
+	}
+	public float añadirSaldo(float valor) {
+        	this.saldo+=valor;
         	return this.saldo;
     	}
-        public void RealizarPedido(int listaProductos[], List <Producto> catalogo){
-
-	
-
-	
-	}
 }
