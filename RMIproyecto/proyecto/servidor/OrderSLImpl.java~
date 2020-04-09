@@ -1,0 +1,37 @@
+import java.rmi.*;
+import java.util.*;
+import java.rmi.server.*;
+
+class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
+	List<Usuario> u;
+    OrderSLImpl() throws RemoteException {
+	        u = new LinkedList<Usuario>();
+     }
+    public Usuario crearUsuario(String nombre, String contraseña) throws RemoteException { //Crea el usuario(con 10e de saldo inicial) y devuelve el objeto
+	String saldo = 10;
+	Usuario u = new Usuario(nombre,contraseña,saldo);
+        u.add(u);
+        return u;
+    }
+    public boolean comprobarContraseña(String nombre, String contraseña) throws RemoteException { //Para comprobar tupla nombre-contraseña,devuelve 1 si existe y 0 en caso contrario
+		
+        boolean correcto = false;
+      	
+ 	for (Cuenta i: u) {
+                if(nombre==i.nombre())
+			if(contraseña==i.contraseña());
+				correcto=true;
+            }
+        return correcto;
+
+}
+	
+    public boolean existeUsuario(String nombre) throws RemoteException { //Para comprobar si el usuario existe, devuelve 1 si existe y 0 en caso contrario
+        boolean encontrado = false;
+            for (Cuenta i: u) {
+                if(nombre==i.nombre())
+			encontrado = true;
+            }
+        return encontrado;
+  }
+}
