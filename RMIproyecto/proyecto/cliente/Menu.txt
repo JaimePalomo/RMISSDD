@@ -3,4 +3,5 @@ Elige la operación que quieras realizar:
 2.Mostrar catálogo
 3.Realizar pedido
 4.Modificar datos de usuario
-5.Salir
+5.Añadir saldo
+6.Salir
