@@ -1,4 +1,4 @@
-
+//fichero de usuario 
 import java.rmi.*;
 
 interface Usuario extends Remote {
