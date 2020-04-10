@@ -7,7 +7,7 @@ class Pedido implements Serializable {
 	private Date fecha; 
 	List <Producto> Carrito;
 	Usuario usuario;
-	public Pedido(int id, Date fecha, List <Producto> Carrito, Usuario usu)
+	public Pedido(int id, Date fecha, List <Producto> Carrito, Usuario usuario)
 	{
 		this.Carrito=Carrito;
 		this.id=id;
