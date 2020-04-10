@@ -14,9 +14,11 @@ class ClienteComercio {
 	public static int AÑADIR_SALDO = 5;
 	public static int SALIR = 6;
 	boolean existe;
+	boolean administrador;
 	Usuario usuario;
 	int flag = 1; //Bandera para la salida del menu
-	int flag2 = 1;
+	int flag2 = 1; //Bandera para la salida de creación de usuario e inicio de sesion
+	int flag3 = 1; //Bandera para la salida de la concesión de administrador al usuario
 	List <Producto> catalogo; //Lista en la que guardaremos los objetos de la clase Producto
 	
         if (args.length!=2) {
@@ -52,7 +54,32 @@ class ClienteComercio {
 		    }
 		}
 		else{
-		    usuario = srv.crearUsuario(nomUsu, password);
+		    System.out.println("Introduzca la dirección de envío para vincularla a tu usuario: ");
+		    Scanner sc = new Scanner(System.in);
+		    String direccion = sc.nextLine();
+		    System.out.println("Introduzca el saldo inicial para tu usuario: ");
+		    Scanner sc = new Scanner(System.in);
+		    float saldoIni = sc.nextFloat();
+		    while(flag3==0){
+			System.out.println("¿El usuario va a ser admin?");
+			System.out.println("1.Sí");
+			System.out.println("2.No");
+			Scanner sc = new Scanner(System.in);
+			int aux = sc.nextInt();
+			switch (aux){
+			case 1:
+			    administrador=1;
+			    break;
+			case 2:
+			    administrador=0;
+			    break;
+			default:
+			    flag3=0;
+			    System.out.println("Introduce 1 ó 2");
+			}
+		    }
+		    
+		    usuario = srv.crearUsuario(nomUsu, password, saldoIni, direccion, administrador);
 		    flag2=0;
 		    srv.guardarCambios();
 		    System.out.println("Registro de usuario completado");
@@ -111,6 +138,9 @@ class ClienteComercio {
 	for (Pedido x : p){
 	    System.out.println("PEDIDO NUMERO "+ numPedido);
 	    System.out.println("Fecha: " + x.obtenerFecha() + "Id: "+ x.obtenerID());
+	    System.out.println("Dirección de envío: "+ x.usuario.obtenerDireccion());
+	    System.out.println("Productos: ");
+	    pro=x.obtenerCarrito();
 	    for(Producto z : pro){
 		System.out.println("Nombre: "+ z.obtenerNombre()+ "Precio: "+ z.obtenerPrecio());
 	    }
