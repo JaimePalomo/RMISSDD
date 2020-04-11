@@ -4,4 +4,5 @@ Elige la operación que quieras realizar:
 3.Realizar pedido
 4.Modificar datos de usuario
 5.Añadir saldo
-6.Salir
+6.Añadir producto al catálogo (necesitas ser administrador)
+7.Salir

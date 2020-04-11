@@ -12,11 +12,14 @@ class ClienteComercio {
 	public static int REALIZAR_PEDIDO = 3;
 	public static int MODIFICAR_DATOS_USUARIO = 4;
 	public static int AÑADIR_SALDO = 5;
-	public static int SALIR = 6;
+	public static int AÑADIR_PRODUCTO = 6;
+	public static int SALIR = 7;
 	boolean existe;
+	boolean administrador;
 	Usuario usuario;
 	int flag = 1; //Bandera para la salida del menu
-	int flag2 = 1;
+	int flag2 = 1; //Bandera para la salida de creación de usuario e inicio de sesion
+	int flag3 = 1; //Bandera para la salida de la concesión de administrador al usuario
 	List <Producto> catalogo; //Lista en la que guardaremos los objetos de la clase Producto
 	
         if (args.length!=2) {
@@ -52,7 +55,32 @@ class ClienteComercio {
 		    }
 		}
 		else{
-		    usuario = srv.crearUsuario(nomUsu, password);
+		    System.out.println("Introduzca la dirección de envío para vincularla a tu usuario: ");
+		    Scanner sc = new Scanner(System.in);
+		    String direccion = sc.nextLine();
+		    System.out.println("Introduzca el saldo inicial para tu usuario: ");
+		    Scanner sc = new Scanner(System.in);
+		    float saldoIni = sc.nextFloat();
+		    while(flag3==0){
+			System.out.println("¿El usuario va a ser admin?");
+			System.out.println("1.Sí");
+			System.out.println("2.No");
+			Scanner sc = new Scanner(System.in);
+			int aux = sc.nextInt();
+			switch (aux){
+			case 1:
+			    administrador=1;
+			    break;
+			case 2:
+			    administrador=0;
+			    break;
+			default:
+			    flag3=0;
+			    System.out.println("Introduce 1 ó 2");
+			}
+		    }
+		    
+		    usuario = srv.crearUsuario(nomUsu, password, saldoIni, direccion, administrador);
 		    flag2=0;
 		    srv.guardarCambios();
 		    System.out.println("Registro de usuario completado");
@@ -73,17 +101,25 @@ class ClienteComercio {
 		case MOSTRAR_CATÁLOGO:
 		  
 		    for(Producto z: catalogo)
-			System.out.println(z.getNombre() + "	precio: " + z.getPrecio() +"euros	id: " z.getId() "\n" ); //Imprimimos el catálago
+			System.out.println(z.obtenerNombre() + "	precio: " + z.obtenerPrecio() +"euros	id: " z.obtenerId() "\n" ); //Imprimimos el catálago
 		    break;
 		case REALIZAR_PEDIDO:
 		    realizarPedido(u, catalogo, srv);
 		    break;
 		case MODIFICAR_DATOS_USUARIO:
-		    
+		    modificarUsuario(u);
 		    break;
 		case AÑADIR_SALDO:
 		    añadirSaldo(u);
 		    srv.guardarCambios();
+		    break;
+		case AÑADIR_PRODUCTO:
+		    if(u.isAdmin()){
+			añadirProducto(srv);
+			srv.guardarCambios();    	
+		    }
+		    else
+			System.out.println("Necesita ser administrador para realizar esta acción");
 		    break;
 		case SALIR:
 		    srv.guardarCambios();
@@ -111,6 +147,9 @@ class ClienteComercio {
 	for (Pedido x : p){
 	    System.out.println("PEDIDO NUMERO "+ numPedido);
 	    System.out.println("Fecha: " + x.obtenerFecha() + "Id: "+ x.obtenerID());
+	    System.out.println("Dirección de envío: "+ x.usuario.obtenerDireccion());
+	    System.out.println("Productos: ");
+	    pro=x.obtenerCarrito();
 	    for(Producto z : pro){
 		System.out.println("Nombre: "+ z.obtenerNombre()+ "Precio: "+ z.obtenerPrecio());
 	    }
@@ -182,6 +221,17 @@ class ClienteComercio {
 	    usuario.cambiarDireccion(direccion);
 	    break;
 	}
+    }
+
+    public void añadirProducto(OrderSL srv){
+	System.out.println("Nombre del producto a añadir: ");
+	Scanner sc = new Scanner(System.in);
+	String nombre = sc.nextLine();
+	System.out.println("Precio del producto a añadir: ");
+	Scanner sc = new Scanner(System.in);
+	float precio = sc.nextFloat();
+	srv.crearProducto(nombre, precio);
+	System.out.println("Producto añadido correctamente");
     }
 }
 
