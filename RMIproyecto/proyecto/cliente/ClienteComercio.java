@@ -107,7 +107,7 @@ class ClienteComercio {
 		    realizarPedido(u, catalogo, srv);
 		    break;
 		case MODIFICAR_DATOS_USUARIO:
-		    
+		    modificarUsuario(u);
 		    break;
 		case AÑADIR_SALDO:
 		    añadirSaldo(u);
