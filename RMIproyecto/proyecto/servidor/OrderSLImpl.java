@@ -1,10 +1,7 @@
 import java.rmi.*;
 import java.util.*;
 import java.rmi.server.*;
-import java.ObjectOutputStream;
-import java.ObjectInputStream;
-import java.FileOutputStream;
-import java.FileInputStream;
+import java.io.*;
 
 class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	List<Usuario> Usuarios;
@@ -14,22 +11,36 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Usuarios = new LinkedList<Usuario>();  //Inicializamos las listas de objetos
        	Productos = new LinkedList<Producto>();
 	Pedidos = new LinkedList<Pedido>();
-
-	ObjectInputStream usu = new ObjectInputStream(new FileInputStream("Usuarios.obj"));
-	ObjectInputStream pro = new ObjectInputStream(new FileInputStream("Productos.obj"));
-	ObjectInputStream ped = new ObjectInputStream(new FileInputStream("Pedidos.obj"));
-	Usuarios = (List <Usuario>) usu.readObject();
-	Productos = (List <Producto>) pro.readObject();
-	Pedidos = (List <Pedido>) ped.readObject();
-	usu.close();
-	pro.close();
-	ped.close();   
+	try{
+	ObjectInputStream usu_entrada = new ObjectInputStream(new FileInputStream("Usuarios.dat"));
+	ObjectInputStream pro_entrada = new ObjectInputStream(new FileInputStream("Productos.dat"));
+	ObjectInputStream ped_entrada = new ObjectInputStream(new FileInputStream("Pedidos.dat"));
+	Usuarios = (List <Usuario>) usu_entrada.readObject();
+	Productos = (List <Producto>) pro_entrada.readObject();
+	Pedidos = (List <Pedido>) ped_entrada.readObject();
+	usu_entrada.close();
+	pro_entrada.close();
+	ped_entrada.close();   
+	}catch(Exception e){
+		System.out.println(e);
+	}
+	
      }
         public void crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException { //Crea el usuario y devuelve el objeto
 	Usuario usuario = new Usuario(nombre,contraseña,saldo, direccion, null, admin);
         Usuarios.add(usuario);
     }
-	public void crearProducto(String nombre, int id, float precio) throws RemoteException { //Crea el producto y devuelve el objeto
+	public void crearProducto(String nombre, float precio) throws RemoteException { //Crea el producto
+		boolean repetido = false;
+		int id;
+		do{
+		Random numAleatorio = new Random();   // Genera un int de forma aleatoria y comprueba que no esté repetido en la lista
+		id = numAleatorio.nextInt();
+		for (Producto i: Productos){
+			if(id==i.obtenerId())
+				repetido = true;		
+		}
+		}while(repetido);
 		Producto producto = new Producto(nombre,id,precio);
 		Productos.add(producto);
 	    }
@@ -41,8 +52,16 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 				Carrito.add(j);
 		}
 	}
-	Random numAleatorio = new Random();   // Genera un int de forma aleatoria
-	int id = numAleatorio.nextInt();
+	int id;
+	boolean repetido = false;
+		do{
+		Random numAleatorio = new Random();   // Genera un int de forma aleatoria y comprueba que no esté repetido en la lista
+		id = numAleatorio.nextInt();
+		for (Pedido i: Pedidos){
+			if(id==i.obtenerId())
+				repetido = true;		
+		}
+		}while(repetido);
 	Date fecha = new Date();
 	Pedido ped = new Pedido(id,fecha,Carrito,usuario);
 	return id;		  //Devuelve el id del pedido
@@ -53,7 +72,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	
  	for (Usuario i: Usuarios) {
                 if(nombre==i.obtenerNombre())
-			if(contraseña==i.obtenerContraseña());
+			if(contraseña==i.obtenerContraseña())
 				usuario=i;
             }
         return usuario;
@@ -61,24 +80,31 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	}
 	public void guardarCambios() throws RemoteException { //Guarda las listas de objetos en los obj sobreescribiéndolos
 	
-	File usu = new File ("Usuarios.obj");
-	File pro = new File ("Productos.obj");
-	File ped = new File ("Pedidos.obj");   //Borramos los ficheros anteriores(con ObjectOutputStream sobreescribir genera un problema de cabeceras)
-	usu.delete();
-	pro.delete();
-	ped.delete();	
+	File usu_borrar = new File ("Usuarios.dat");
+	File pro_borrar = new File ("Productos.dat");
+	File ped_borrar = new File ("Pedidos.dat");   //Borramos los ficheros anteriores(con ObjectOutputStream sobreescribir genera un problema de cabeceras)
+	usu_borrar.delete();
+	pro_borrar.delete();
+	ped_borrar.delete();
+	
 
-	ObjectOutputStream usu = new ObjectInputStream(new FileOutputStream("Usuarios.obj"));
-	ObjectOutputStream pro = new ObjectInputStream(new FileOutputStream("Productos.obj"));  //Volvemos a crear los .obj para guardar nuestras listas de objetos
-	ObjectOutputStream ped = new ObjectInputStream(new FileOutputStream("Pedidos.obj"));
+          	
+	
+	try  {
+	ObjectOutputStream usu_salida = new ObjectOutputStream(new FileOutputStream("Usuarios.dat"));
+	ObjectOutputStream pro_salida = new ObjectOutputStream(new FileOutputStream("Productos.dat"));  //Volvemos a crear los .dat para guardar nuestras listas de objetos
+	ObjectOutputStream ped_salida = new ObjectOutputStream(new FileOutputStream("Pedidos.dat"));
 
-	usu.writeObject(Usuarios);
-	pro.writeObject(Productos);
-	ped.writeObject(Pedidos);
+	usu_salida.writeObject(Usuarios);
+	pro_salida.writeObject(Productos);
+	ped_salida.writeObject(Pedidos);
 
-	usu.close();
-	pro.close();
-	ped.close();
+	usu_salida.close();
+	pro_salida.close();
+	ped_salida.close();
+	}catch(Exception e){
+		System.out.println(e);
+	}	
 
 	}
     public boolean existeUsuario(String nombre) throws RemoteException { //Para comprobar si el usuario existe, devuelve 1 si existe y 0 en caso contrario

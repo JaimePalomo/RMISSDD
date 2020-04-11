@@ -27,7 +27,7 @@ class Producto implements Serializable {
 	public void cambiarNombre(String nombre_nuevo) {
         	this.nombre=nombre_nuevo;
      	}
-	public void cambiarId(String id_nuevo) {
+	public void cambiarId(int id_nuevo) {
         	this.id=id_nuevo;
      	}
     	

@@ -11,7 +11,7 @@ class ServidorComercio  {
             System.setSecurityManager(new RMISecurityManager());
         }
         try {
-            BancoImpl srv = new OrderSLImpl();
+            OrderSLImpl srv = new OrderSLImpl();
             Naming.rebind("rmi://localhost:" + args[0] + "/OrderSL", srv);
         }
         catch (RemoteException e) {

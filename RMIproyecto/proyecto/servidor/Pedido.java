@@ -14,8 +14,8 @@ class Pedido implements Serializable {
 		this.fecha=fecha;
 		this.usuario=usuario;
 	}
-     	public List<Producto> obtenerProductos() {
-        	return this.Productos;
+     	public List<Producto> obtenerCarrito() {
+        	return this.Carrito;
      	}
 	public int obtenerId() {
         	return this.id;
