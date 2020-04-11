@@ -114,8 +114,10 @@ class ClienteComercio {
 		    srv.guardarCambios();
 		    break;
 		case AÑADIR_PRODUCTO:
-		    if(u.isAdmin())
+		    if(u.isAdmin()){
 			añadirProducto(srv);
+			srv.guardarCambios();    	
+		    }
 		    else
 			System.out.println("Necesita ser administrador para realizar esta acción");
 		    break;
