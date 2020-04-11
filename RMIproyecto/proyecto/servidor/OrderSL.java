@@ -7,7 +7,7 @@ import java.io.*;
 
 
 interface OrderSL extends Remote {
-        void crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException;
+        Usuario crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException;
 	void crearProducto(String nombre, float precio) throws RemoteException;
 	int realizarPedido(int listaProductos[], Usuario usuario) throws RemoteException;
 	Usuario iniciarSesion(String nombre, String contraseña) throws RemoteException;

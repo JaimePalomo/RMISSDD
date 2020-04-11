@@ -46,9 +46,13 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	
 	
      }
-        public void crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException { //Crea el usuario y devuelve el objeto
+        public Usuario crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException { //Crea el usuario y devuelve el objeto
 	Usuario usuario = new Usuario(nombre,contraseña,saldo, direccion, null, admin);
         Usuarios.add(usuario);
+	for(Usuario z: Usuarios){
+			System.out.println(z.obtenerNombre()); 
+		    }
+	return usuario;
     }
 	public void crearProducto(String nombre, float precio) throws RemoteException { //Crea el producto
 		boolean repetido = false;
@@ -137,6 +141,9 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
         return encontrado;
   	}
     public List<Producto> obtenerProductos() throws RemoteException{   //Obtener todos los productos existentes
+	for(Producto z: Productos){
+			System.out.println(z.obtenerNombre() + "	precio: " + z.obtenerPrecio() +"euros	id: " + z.obtenerId()); 
+		    }
 	return Productos;
     }
     public List<Pedido> obtenerPedidos() throws RemoteException{    //Obtener todos los pedidos existentes
