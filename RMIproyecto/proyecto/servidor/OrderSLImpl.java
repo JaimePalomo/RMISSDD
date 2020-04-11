@@ -11,19 +11,39 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Usuarios = new LinkedList<Usuario>();  //Inicializamos las listas de objetos
        	Productos = new LinkedList<Producto>();
 	Pedidos = new LinkedList<Pedido>();
-	try{
-	ObjectInputStream usu_entrada = new ObjectInputStream(new FileInputStream("Usuarios.dat"));
-	ObjectInputStream pro_entrada = new ObjectInputStream(new FileInputStream("Productos.dat"));
-	ObjectInputStream ped_entrada = new ObjectInputStream(new FileInputStream("Pedidos.dat"));
-	Usuarios = (List <Usuario>) usu_entrada.readObject();
-	Productos = (List <Producto>) pro_entrada.readObject();
-	Pedidos = (List <Pedido>) ped_entrada.readObject();
-	usu_entrada.close();
-	pro_entrada.close();
-	ped_entrada.close();   
+	
+	File archivo_usuario = new File("Usuarios.dat");
+	File archivo_producto = new File("Productos.dat");	  //Abrimos los ficheros .dat donde tenemos guardados los datos
+	File archivo_pedido = new File("Pedidos.dat");
+				
+	if (archivo_usuario.length()!=0){
+		try{
+		ObjectInputStream usu_entrada = new ObjectInputStream(new FileInputStream("Usuarios.dat")); //Leemos todos los .dat y los guardamos en listas de objetos, pero solo si no están vacíos
+		Usuarios = (List <Usuario>) usu_entrada.readObject();
+		usu_entrada.close(); 
 	}catch(Exception e){
 		System.out.println(e);
+	}	
 	}
+	if (archivo_producto.length()!=0){
+		try{
+		ObjectInputStream pro_entrada = new ObjectInputStream(new FileInputStream("Productos.dat"));
+		Productos = (List <Producto>) pro_entrada.readObject();
+		pro_entrada.close();
+	}catch(Exception e){
+		System.out.println(e);
+	}	
+	}
+	if (archivo_pedido.length()!=0){
+		try{
+		ObjectInputStream ped_entrada = new ObjectInputStream(new FileInputStream("Pedidos.dat"));
+		Pedidos = (List <Pedido>) ped_entrada.readObject();
+		ped_entrada.close(); 
+	}catch(Exception e){
+		System.out.println(e);
+	}	
+	}
+	
 	
      }
         public void crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException { //Crea el usuario y devuelve el objeto
@@ -64,6 +84,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 		}while(repetido);
 	Date fecha = new Date();
 	Pedido ped = new Pedido(id,fecha,Carrito,usuario);
+	Pedidos.add(ped);
 	return id;		  //Devuelve el id del pedido
     }
     public Usuario iniciarSesion(String nombre, String contraseña) throws RemoteException { //Para comprobar tupla nombre-contraseña,devuelve 1 si existe y 0 en caso contrario
@@ -82,7 +103,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	
 	File usu_borrar = new File ("Usuarios.dat");
 	File pro_borrar = new File ("Productos.dat");
-	File ped_borrar = new File ("Pedidos.dat");   //Borramos los ficheros anteriores(con ObjectOutputStream sobreescribir genera un problema de cabeceras)
+	File ped_borrar = new File ("Pedidos.dat");   //Borramos los .dat anteriores para guardar todos los datos con las modificaciones que se hayan hecho durante la sesión(con ObjectOutputStream sobreescribir genera un problema de cabeceras)
 	usu_borrar.delete();
 	pro_borrar.delete();
 	ped_borrar.delete();
@@ -115,8 +136,11 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
             }
         return encontrado;
   	}
-    public List<Producto> obtenerProductos() throws RemoteException{
+    public List<Producto> obtenerProductos() throws RemoteException{   //Obtener todos los productos existentes
 	return Productos;
+    }
+    public List<Pedido> obtenerPedidos() throws RemoteException{    //Obtener todos los pedidos existentes
+	return Pedidos;
     }
 }
 

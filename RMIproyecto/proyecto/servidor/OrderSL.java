@@ -14,4 +14,5 @@ interface OrderSL extends Remote {
 	void guardarCambios() throws RemoteException;
 	boolean existeUsuario(String nombre) throws RemoteException;
 	List<Producto> obtenerProductos() throws RemoteException;
+	List<Pedido> obtenerPedidos() throws RemoteException;
 }
