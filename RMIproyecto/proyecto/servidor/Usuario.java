@@ -8,16 +8,14 @@ class Usuario implements Serializable {
 	private String contraseña;
 	private float saldo; 
 	private String direccion;
-	//List <Pedido> Pedidos;
 	private boolean admin;
-	private static final long serialVersionUID=6762531975668221922L;
+	private static final long serialVersionUID=6762531975668221922L; //Forzamos la coincidencia del serialVersionUID con los que están guardados en el .dat
 	public Usuario(String nombre, String contraseña, float saldo, String direccion, boolean admin)
 	{
 		this.nombre=nombre;
 		this.contraseña=contraseña;
 		this.saldo=saldo;
 		this.direccion=direccion;
-		//this.Pedidos=Pedidos;
 		this.admin=admin;
 	}
 	public String obtenerNombre() {
@@ -35,23 +33,19 @@ class Usuario implements Serializable {
 	public boolean isAdmin() {
 		return this.admin;	
 	}
-	/*public void hacerPedido(Pedido pedido) {
-        	 this.Pedidos.add(pedido);
-     	}*/
-	/*public List<Pedido> obtenerPedidos() {
-        	 return this.Pedidos;
-     	}*/
 	public void cambiarNombre(String nuevo) {
-		this.nombre = nuevo;	
+		this.nombre = nuevo;
 	}
 	public void cambiarContraseña(String nueva) {
-		this.contraseña = nueva;	
+		this.contraseña = nueva;
 	}
 	public void cambiarDireccion(String nueva) {
-		this.direccion = nueva;	
+		this.direccion = nueva;
 	}
-	public void hacerAdmin(boolean admin_nuevo){
-		this.admin=admin_nuevo;	
+	public Usuario hacerAdmin(boolean admin_nuevo){
+		this.admin=admin_nuevo;
+		return this;	
+		
 	}
 	public float añadirSaldo(float valor) {
         	this.saldo+=valor;

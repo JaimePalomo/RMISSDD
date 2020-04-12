@@ -6,7 +6,7 @@ class Producto implements Serializable {
 	private String nombre;
 	private int id;
 	private float precio; 
-	private static final long serialVersionUID=-9128118492657266928L;
+	private static final long serialVersionUID=-9128118492657266928L;//Forzamos la coincidencia del serialVersionUID con los que están guardados en el .dat
 	public Producto(String nombre, int id, float precio)
 	{
 		this.nombre=nombre;

@@ -67,12 +67,15 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 		Producto producto = new Producto(nombre,id,precio);
 		Productos.add(producto);
 	    }
-	public int realizarPedido(int listaProductos[], Usuario usuario) throws RemoteException{ //Crea una nueva Lista de Productos que será el carrito
+	public void realizarPedido(int listaProductos[], Usuario usuario) throws RemoteException{ //Crea una nueva Lista de Productos que será el carrito
 	List <Producto> Carrito=new LinkedList<Producto>(); //Estará compuesto por los productos cuya id coincida con las id proporcionadas por el cliente
+	float precio=0;
 	for(int i=0; i<listaProductos.length;i++){
 		for(Producto j: Productos){
-			if (j.obtenerId()==listaProductos[i])
+			if (j.obtenerId()==listaProductos[i]){
 				Carrito.add(j);
+				precio+=j.obtenerPrecio();
+			}
 		}
 	}
 	int id;
@@ -88,10 +91,9 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 		}
 		}while(repetido);
 	Date fecha = new Date();
-	Pedido ped = new Pedido(id,fecha,Carrito,usuario);
+	String direccion = usuario.obtenerDireccion();
+	Pedido ped = new Pedido(id,fecha,Carrito,usuario,precio,direccion);
 	Pedidos.add(ped); //Añadimos el pedido a la lista de pedidos
-	//usuario.hacerPedido(ped); //Se añade el pedido al usuario
-	return id;		  //Devuelve el id del pedido
     }
     public Usuario iniciarSesion(String nombre, String contraseña) throws RemoteException { //Para comprobar tupla nombre-contraseña,devuelve 1 si existe y 0 en caso contrario
 
@@ -135,12 +137,20 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 
 	}
     public boolean existeUsuario(String nombre) throws RemoteException { //Para comprobar si el usuario existe, devuelve 1 si existe y 0 en caso contrario
-        boolean encontrado = false;
+        boolean existe = false;
             for (Usuario i: Usuarios) {
                 if(nombre.equals(i.obtenerNombre()))
-			encontrado = true;
+					existe = true;
+			}
+        return existe;
+  	}
+	public boolean existeProducto(String nombre) throws RemoteException { //Para comprobar si el producto existe, devuelve 1 si existe y 0 en caso contrario
+        boolean existe = false;
+            for (Producto i: Productos) {
+                if(nombre.equals(i.obtenerNombre()))
+					existe = true;
             }
-        return encontrado;
+        return existe;
   	}
     public List<Producto> obtenerProductos() throws RemoteException{   //Obtener todos los productos existentes
 
@@ -152,6 +162,17 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
     public List<Usuario> obtenerUsuarios() throws RemoteException{    //Obtener todos los usuarios existentes
 	return Usuarios;
     }
+	public void modificarUsuario(Usuario usuario_nuevo, String nombre_usuario_antiguo){
+		for (Usuario i: Usuarios){
+			if(i.obtenerNombre().equals(nombre_usuario_antiguo))  //Buscamos la coincidencia del nombre a cambiar en nuestra base de datos y borramos el objeto Usuario y creamos uno con los nuevos atributos de usuario_nuevo
+				Usuarios.remove(i);
+		}
+		Usuarios.add(usuario_nuevo);	
+		for (Pedido p: Pedidos){
+			if(p.obtenerUsuario().obtenerNombre().equals(nombre_usuario_antiguo))
+				p.cambiarUsuario(usuario_nuevo);		
+		}
+	}
 	/*public void borrarProducto(Producto producto) {
         	Productos.remove(producto);
 
