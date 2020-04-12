@@ -18,6 +18,8 @@ cd ../servidor
 
 echo "EJECUTAMOS EL SERVIDOR: "
 
+pkill rmiregistry
+
 rmiregistry 54321 &
 
 java -Djava.security.policy=servidor.permisos ServidorComercio 54321
