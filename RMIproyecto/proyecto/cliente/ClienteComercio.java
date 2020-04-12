@@ -24,8 +24,8 @@ class ClienteComercio {
 	int flag = 1; //Bandera para la salida del menu
 	int flag2 = 1; //Bandera para la salida de creación de usuario e inicio de sesion
 	int flag3 = 0; //Bandera para la salida de la concesión de administrador al usuario
-	List <Producto> catalogo; //Lista en la que guardaremos los objetos de la clase Producto
-	
+	List <Producto> catalogo;//Lista en la que guardaremos los objetos de la clase Producto
+	List <Usuario> Usuarios;
         if (args.length!=2) {
             System.err.println("Uso: ClienteComercio hostregistro numPuertoRegistro");
             return;
@@ -36,6 +36,7 @@ class ClienteComercio {
 
         try {
             OrderSL srv = (OrderSL) Naming.lookup("//" + args[0] + ":" + args[1] + "/OrderSL");
+		clear();
 	    while(flag2 == 1){
 		System.out.println("Introduzca nombre de usuario: ");
 		Scanner sc = new Scanner(System.in);
@@ -90,9 +91,6 @@ class ClienteComercio {
 		}
 	    }
 	    
-            
-	    catalogo=srv.obtenerProductos(); //La función ObtenerCatalogo() devolvera una lista de clase Producto con todos los productos disponibles
-	    System.out.println("catalogo obtenido");
 
 	    try{
 		    File f = new File("OrderSL.txt");
@@ -106,6 +104,7 @@ class ClienteComercio {
 		    e.printStackTrace();
 		}
 	    while( flag == 1){ //El bucle se seguirá realizando e imprimiendo el menú hasta que el cliente quiera salir
+		 catalogo=srv.obtenerProductos(); //La función ObtenerCatalogo() devolvera una lista de clase Producto con todos los productos disponibles	
 		try{
 		    File f = new File("Menu.txt");
 		    FileReader fr = new FileReader(f);
@@ -121,40 +120,60 @@ class ClienteComercio {
 		int i = sc.nextInt();
 		switch (i){
 		case COMPROBAR_PEDIDOS:
-		    comprobarPedidos(usuario); 
+			clear();
+		    verPedidos(usuario, srv); 
 		    break;
 		case MOSTRAR_CATÁLOGO:
+			clear();
+			System.out.println("-----------------------------------------------------------------------------------------"); 
 		    for(Producto z: catalogo){
 			System.out.println(z.obtenerNombre() + "	precio: " + z.obtenerPrecio() +"euros	id: " + z.obtenerId()); 
 		    }
+										   			
+			System.out.println("-----------------------------------------------------------------------------------------"); 
 		    break;
 		case REALIZAR_PEDIDO:
+			clear();
 		    realizarPedido(usuario, catalogo, srv);
+			clear();
 		    break;
 		case MODIFICAR_DATOS_USUARIO:
+			clear();
 		    modificarUsuario(usuario);
 		    srv.guardarCambios();
+			clear();
 		    break;
 		case AÑADIR_SALDO:
+			clear();
 		    añadirSaldo(usuario);
 		    srv.guardarCambios();
+			clear();
 		    break;
 		case AÑADIR_PRODUCTO:
+			clear();
 		    if(usuario.isAdmin()){
 			añadirProducto(srv);
-			srv.guardarCambios();    	
-		    }
+			srv.guardarCambios();  
+			clear(); 		    
+			}
 		    else
-			System.out.println("Necesita ser administrador para realizar esta acción");
+			System.out.println("Necesita ser administrador para realizar esta acción"); 	
 		    break;
 		case MOSTRAR_TODOS_PEDIDOS:
+			clear();
 		    if(usuario.isAdmin()){
-			obtenerPedidos(srv);
+			Usuarios = srv.obtenerUsuarios();
+			for(Usuario usuario_x: Usuarios) {   //Obtenemos todos los usuarios y vamos mostrando sus pedidos
+				verPedidos(usuario_x, srv);	
+	System.out.println("-------------------------------------"); 		
+				}
+										  System.out.println("-----------------------------------------------------------------------------------------"); 
 		    }
 		    else
 			System.out.println("Necesita ser administrador para realizar esta acción");
 		    break;
 		case SALIR:
+			clear();
 		    srv.guardarCambios();
 		    flag = 0;
 		    break;
@@ -172,24 +191,32 @@ class ClienteComercio {
         }
     }
 	
-    public static void comprobarPedidos(Usuario u){ //Esta función llamará al servidor para que nos devuelva todos los pedidos que tenga el usuario
+    public static void verPedidos(Usuario u, OrderSL srv){ //Esta función llamará al servidor para que nos devuelva todos los pedidos que tenga el usuario
 	int numPedido = 1;
 	List <Producto> pro;
 	List <Pedido> p;
-	p=u.obtenerPedidos();
+	try{
+	p=srv.obtenerPedidos();
 	for (Pedido x: p){
-	    System.out.println("PEDIDO NUMERO "+ numPedido);
-	    System.out.println("Fecha: " + x.obtenerFecha() + "Id: "+ x.obtenerId());
-	    System.out.println("Dirección de envío: "+ x.usuario.obtenerDireccion());
-	    System.out.println("Productos: ");
-	    pro=x.obtenerCarrito();
-	    for(Producto z: pro){
-		System.out.println("Nombre: "+ z.obtenerNombre()+ "Precio: "+ z.obtenerPrecio());
+		if(u.obtenerNombre().equals(x.obtenerUsuario().obtenerNombre())){
+		    System.out.println("PEDIDO NUMERO "+ numPedido);
+		    System.out.println("Realizado por: "+ u.obtenerNombre());
+		    System.out.println("Fecha: " + x.obtenerFecha() + "Id: "+ x.obtenerId());
+		    System.out.println("Dirección de envío: "+ x.obtenerUsuario().obtenerDireccion());
+		    System.out.println("Productos: ");
+		    pro=x.obtenerCarrito();
+		    for(Producto z: pro){
+			System.out.println("Nombre: "+ z.obtenerNombre()+ "Precio: "+ z.obtenerPrecio());
+		    }
+		    numPedido++;
+		    System.out.println("-------------------------------------------");
 	    }
-	    numPedido++;
-	    System.out.println("-------------------------------------------");
+	}
+	}catch(Exception e){
+			    System.out.println("No se ha podido obtener el catálogo");
 	}
     }
+
     
     public static void realizarPedido(Usuario u, List <Producto> catalogo, OrderSL srv){ //Esta función le pasará al servidor un array de int con las id de los productos que quiere pedir
 	int flag = 0;
@@ -197,6 +224,10 @@ class ClienteComercio {
 	int aux=0;
 	boolean existe = false;
 	
+	for(Producto z: catalogo){
+			System.out.println(z.obtenerNombre() + "	precio: " + z.obtenerPrecio() +"euros	id: " + z.obtenerId()); 
+		    }
+			    System.out.println("-------------------------------------------");	
 	while(flag == 0){
 	    System.out.println("Introduzca el id del producto");
 	    System.out.println("Introduzca 0 para finalizar pedido");
@@ -239,7 +270,7 @@ class ClienteComercio {
     }
 
     public static void añadirSaldo(Usuario u){
-	Float nuevoSaldo; 
+	float nuevoSaldo; 
 	System.out.println("Saldo actual: "+ u.obtenerSaldo() +"euros \n");
 	System.out.println("Saldo a añadir: ");
 	Scanner sc = new Scanner(System.in);
@@ -251,8 +282,6 @@ class ClienteComercio {
 
     public static void modificarUsuario(Usuario usuario){
 	int flag = 1;
-
-
 	while(flag == 1){
 	    System.out.println("1. Modificar nombre");
 	    System.out.println("2. Modificar contraseña");
@@ -260,7 +289,7 @@ class ClienteComercio {
 	    System.out.println("4. Volver al menu");
 	    Scanner sc = new Scanner(System.in);
 	    int i = sc.nextInt();
-	    
+	    System.out.println("-------------------------------------");
 	    switch(i){
 	    case 1:
 		System.out.println("Introduzca nuevo nombre de usuario: ");
@@ -282,6 +311,7 @@ class ClienteComercio {
 		break;
 	    case 4:
 		flag = 0;
+		clear();
 		break;
 	    default:
 		System.out.println("Opcion no valida");
@@ -303,7 +333,7 @@ class ClienteComercio {
         }
     }
 
-    public static void obtenerPedidos(OrderSL srv){
+   /* public static void obtenerPedidos(OrderSL srv){
 	List <Pedido> pedidos;
 	int numPedidos = 0;
 
@@ -321,5 +351,9 @@ class ClienteComercio {
 	}catch (RemoteException e) {
             System.err.println("Error de comunicacion: " + e.toString());
         }
-    }
+    }*/
+	public static void clear() {  
+	    System.out.print("\033[H\033[2J");  
+	    System.out.flush();  
+	} 
 }

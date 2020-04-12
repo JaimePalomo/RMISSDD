@@ -7,6 +7,7 @@ class Pedido implements Serializable {
 	private Date fecha; 
 	List <Producto> Carrito;
 	Usuario usuario;
+	private static final long serialVersionUID=4542458884459387270L;
 	public Pedido(int id, Date fecha, List <Producto> Carrito, Usuario usuario)
 	{
 		this.Carrito=Carrito;
@@ -26,12 +27,4 @@ class Pedido implements Serializable {
 	public Usuario obtenerUsuario(){
 		return this.usuario;	
 	}
-    /*	public void añadirProducto(Producto producto) {
-        	Carrito.add(producto);
-		this.Carrito=Carrito;
-     	}
-	public void borrarProducto(Producto producto) {
-        	Carrito.delete(producto);
-		this.Carrito=Carrito;
-     	} */
 }

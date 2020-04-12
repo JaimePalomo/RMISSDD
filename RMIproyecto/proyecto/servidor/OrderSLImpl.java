@@ -47,19 +47,18 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	
      }
         public Usuario crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException { //Crea el usuario y devuelve el objeto
-	Usuario usuario = new Usuario(nombre,contraseña,saldo, direccion, null, admin);
+	Usuario usuario = new Usuario(nombre,contraseña,saldo, direccion, admin);
         Usuarios.add(usuario);
-	for(Usuario z: Usuarios){
-			System.out.println(z.obtenerNombre()); 
-		    }
 	return usuario;
     }
 	public void crearProducto(String nombre, float precio) throws RemoteException { //Crea el producto
 		boolean repetido = false;
 		int id;
 		do{
-		Random numAleatorio = new Random();   // Genera un int de forma aleatoria y comprueba que no esté repetido en la lista
+		Random numAleatorio = new Random();   // Genera un int de forma aleatoria y comprueba que no esté repetido en la lista y que no sea negativo
 		id = numAleatorio.nextInt();
+		if (id<0)
+			id = id * (-1);
 		for (Producto i: Productos){
 			if(id==i.obtenerId())
 				repetido = true;		
@@ -79,16 +78,19 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	int id;
 	boolean repetido = false;
 		do{
-		Random numAleatorio = new Random();   // Genera un int de forma aleatoria y comprueba que no esté repetido en la lista
+		Random numAleatorio = new Random();   // Genera un int de forma aleatoria y comprueba que no esté repetido en la lista y que no sea negativo	
 		id = numAleatorio.nextInt();
+		if (id<0)
+			id = id * (-1);
 		for (Pedido i: Pedidos){
-			if(id==i.obtenerId())
+			if(id==i.obtenerId() )
 				repetido = true;		
 		}
 		}while(repetido);
 	Date fecha = new Date();
 	Pedido ped = new Pedido(id,fecha,Carrito,usuario);
-	Pedidos.add(ped);
+	Pedidos.add(ped); //Añadimos el pedido a la lista de pedidos
+	//usuario.hacerPedido(ped); //Se añade el pedido al usuario
 	return id;		  //Devuelve el id del pedido
     }
     public Usuario iniciarSesion(String nombre, String contraseña) throws RemoteException { //Para comprobar tupla nombre-contraseña,devuelve 1 si existe y 0 en caso contrario
@@ -96,8 +98,8 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Usuario usuario = null;
 	
  	for (Usuario i: Usuarios) {
-                if(nombre==i.obtenerNombre())
-			if(contraseña==i.obtenerContraseña())
+                if(nombre.equals(i.obtenerNombre()))
+			if(contraseña.equals(i.obtenerContraseña()))
 				usuario=i;
             }
         return usuario;
@@ -135,19 +137,24 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
     public boolean existeUsuario(String nombre) throws RemoteException { //Para comprobar si el usuario existe, devuelve 1 si existe y 0 en caso contrario
         boolean encontrado = false;
             for (Usuario i: Usuarios) {
-                if(nombre==i.obtenerNombre())
+                if(nombre.equals(i.obtenerNombre()))
 			encontrado = true;
             }
         return encontrado;
   	}
     public List<Producto> obtenerProductos() throws RemoteException{   //Obtener todos los productos existentes
-	for(Producto z: Productos){
-			System.out.println(z.obtenerNombre() + "	precio: " + z.obtenerPrecio() +"euros	id: " + z.obtenerId()); 
-		    }
+
 	return Productos;
     }
     public List<Pedido> obtenerPedidos() throws RemoteException{    //Obtener todos los pedidos existentes
 	return Pedidos;
     }
+    public List<Usuario> obtenerUsuarios() throws RemoteException{    //Obtener todos los usuarios existentes
+	return Usuarios;
+    }
+	/*public void borrarProducto(Producto producto) {
+        	Productos.remove(producto);
+
+     	}*/
 }
 

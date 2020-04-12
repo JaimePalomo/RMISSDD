@@ -6,6 +6,7 @@ class Producto implements Serializable {
 	private String nombre;
 	private int id;
 	private float precio; 
+	private static final long serialVersionUID=-9128118492657266928L;
 	public Producto(String nombre, int id, float precio)
 	{
 		this.nombre=nombre;
