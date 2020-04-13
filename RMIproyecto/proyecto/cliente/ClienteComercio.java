@@ -47,29 +47,32 @@ class ClienteComercio {
             OrderSL srv = (OrderSL) Naming.lookup("//" + args[0] + ":" + args[1] + "/OrderSL");
 	    clear();
 	    while(flag2 == 1){
-		System.out.println("Introduzca nombre de usuario: ");
-		do{	
+		do{
+			System.out.println("Introduzca nombre de usuario: ");
 		    flag4 = 1;
 		    try{
 			nomUsu = sc.nextLine();
-			flag4 = 0;
+			if(nomUsu.length()!=0)
+				flag4 = 0;
 		    }catch(InputMismatchException e){
 			System.out.println("Error introduciendo datos"); 
+			sc.next();
 		    }
 		}while(flag4==1);
 		existe = srv.existeUsuario(nomUsu);
-		if(existe){
-		    System.out.println("Introduzca contraseña: ");
-		}
-		else{
-		    System.out.println("Introduzca contraseña para la creacion de un usuario: ");
-		}
 		do{
+		    if(existe){
+		    System.out.println("Introduzca contraseña: ");
+		    }
+		    else{
+		    System.out.println("Introduzca contraseña para la creacion de un usuario: ");
+		    }
 		    flag4 = 1;
 		    try{
 			Console console = System.console();
 			password = new String(console.readPassword());
-			flag4 = 0;
+			if(password.length()!=0)
+				flag4 = 0;
 		    }catch(InputMismatchException e){
 			System.out.println("Error introduciendo datos"); 
 		    }
@@ -84,39 +87,40 @@ class ClienteComercio {
 		    }
 		}
 		else{
-		    System.out.println("Introduzca la dirección de envío para vincularla a tu usuario: ");
 		    do{
-
+			System.out.println("Introduzca la dirección de envío para vincularla a tu usuario: ");
 			flag4 = 1;
 			try{
 			    direccion = sc.nextLine();
-			    flag4 = 0;
+			if(direccion.length()!=0)
+				flag4 = 0;
 			}catch(InputMismatchException e){
 			    System.out.println("Error introduciendo datos"); 
 			}
 		    }while(flag4==1);
-		    System.out.println("Introduzca el saldo inicial para tu usuario: ");
 			flag4 = 1;		    
 			do{
+			System.out.println("Introduzca el saldo inicial para tu usuario: ");
 			try{
 			    saldoIni = sc.nextFloat();
-			    flag4 = 0;
+				flag4 = 0;
 			}catch(InputMismatchException e){
 			    System.out.println("Error introduciendo datos"); 
 				sc.next();
 			}
 		    }while(flag4==1);
 		    while(flag3==0){
+			flag4 = 1;
+			do{
 			System.out.println("¿El usuario va a ser admin?");
 			System.out.println("1.Sí");
 			System.out.println("2.No");
-			flag4 = 1;
-			do{
 			    try{
 				aux = sc.nextInt();
 				flag4 = 0;
 			    }catch(InputMismatchException e){
 				System.out.println("Error introduciendo datos"); 
+				sc.next();
 			    }
 			}while(flag4==1);
 			switch (aux){
@@ -136,7 +140,6 @@ class ClienteComercio {
 		    
 		    usuario = srv.crearUsuario(nomUsu, password, saldoIni, direccion, administrador);
 		    flag2=0;
-		    srv.guardarCambios();
 		    System.out.println("Registro de usuario completado");
 		}
 	    }
@@ -154,7 +157,18 @@ class ClienteComercio {
 		e.printStackTrace();
 	    }
 	    while( flag == 1){ //El bucle se seguirá realizando e imprimiendo el menú hasta que el cliente quiera salir
-		catalogo=srv.obtenerProductos(); //La función ObtenerCatalogo() devolvera una lista de clase Producto con todos los productos disponibles	
+		srv.escribirDatosBBDD(); //Avisamos al servidor de que escriba en su BBDD los posibles cambios que se hayan hecho
+		usuario=srv.iniciarSesion(usuario.obtenerNombre(), usuario.obtenerContraseña()); //Comprobamos si la sesión ha caducado comparando
+		if(usuario==null){                                                            //nuestro usuario con el de la BBDD del servidor
+			clear();
+			System.out.println("La sesión ha caducado");
+			Thread.sleep(2000);
+			i = SALIR; //Para que salga del programa si la sesión ha caducado
+		}			
+		else{
+			System.out.println("¡Bienvenido "+usuario.obtenerNombre()+"!");
+			System.out.println("--------------------------------------------------------------------");		
+		}
 		try{
 		    File f = new File("Menu.txt");
 		    FileReader fr = new FileReader(f);
@@ -166,15 +180,19 @@ class ClienteComercio {
 		}catch(Exception e){
 		    e.printStackTrace();
 		}
-		flag4=1;		
-		do{
-		    try{
-			i = sc.nextInt();
-			flag4 = 0;
-		    }catch(InputMismatchException e){
-			System.out.println("Error introduciendo datos"); 
-		    }
-		}while(flag4==1);
+		flag4=1;
+		if(i!=SALIR){		
+			do{
+			    try{
+				i = sc.nextInt();
+				flag4 = 0;
+			    }catch(InputMismatchException e){
+				System.out.println("Error introduciendo datos"); 
+				sc.next();
+			    }
+			}while(flag4==1);
+		}
+		catalogo=srv.obtenerProductos(); //Obtenemos el catalogo de productos actualizado
 		switch (i){
 		case COMPROBAR_PEDIDOS:
 		    clear();
@@ -196,36 +214,34 @@ class ClienteComercio {
 		case REALIZAR_PEDIDO:
 		    clear();
 			String nombre_usuario = usuario.obtenerNombre();
-		    realizarPedido(usuario, catalogo, srv);
-			srv.modificarUsuario(usuario, nombre_usuario);
-			Thread.sleep(3000);
+		    	realizarPedido(usuario, catalogo, srv);
+			srv.modificarUsuario(usuario, nombre_usuario);    //Avisamos al servidor de que modifique el usuario en su BBDD
+			Thread.sleep(3000);                              //dado que hemos realizado cambios en su saldo
 		    clear();
 		    break;
 		case MODIFICAR_DATOS_USUARIO:
 		    clear();
 			String nombre_usuario_antiguo = usuario.obtenerNombre();
-		    modificarUsuario(usuario, srv); //Modifica los datos del usuario en el cliente y devuelve el usuario con los datos modificados
-			srv.modificarUsuario(usuario, nombre_usuario_antiguo); //Avisa al servidor para que modifique el usuario
-			srv.guardarCambios();
-		    clear();
+		   	modificarUsuario(usuario, srv); //Modifica los datos del usuario en el cliente
+			srv.modificarUsuario(usuario, nombre_usuario_antiguo); //Avisa al servidor para que modifique el usuario en su BBDD
+		    	clear();
 			System.out.println("Datos de usuario modificados correctamente");
 		    break;
 		case AÑADIR_SALDO:
-		    clear();
-			nombre_usuario = usuario.obtenerNombre();
-		    añadirSaldo(usuario);
-			srv.modificarUsuario(usuario, nombre_usuario);
-		    srv.guardarCambios();
-			Thread.sleep(3000);
-		    clear();
+		   	clear();
+			usuario=srv.iniciarSesion(usuario.obtenerNombre(), usuario.obtenerContraseña()); //Obtenemos el usuario actualizado
+			nombre_usuario = usuario.obtenerNombre();                                       //por si se ha realizado algún cambio desde
+		    	añadirSaldo(usuario);                                                          //otra máquina
+			srv.modificarUsuario(usuario, usuario.obtenerNombre());  //Avisamos al servidor de que modifique el usuario en su BBDD
+			Thread.sleep(3000);                              //dado que hemos realizado cambios en su saldo
+		   	clear();
 		    break;
 		case AÑADIR_PRODUCTO:
 		    clear();
 		    if(usuario.isAdmin()){
 			añadirProducto(srv);
-			srv.guardarCambios();  
 			clear(); 
-		    System.out.println("Producto añadido correctamente");	
+		   	System.out.println("Producto añadido correctamente");	
 			System.out.println("----------------------------------------------------"); 		    
 		    }
 		    else{
@@ -251,7 +267,6 @@ class ClienteComercio {
 		    break;
 		case SALIR:
 		    clear();
-		    srv.guardarCambios();
 		    flag = 0;
 		    break;
 		default:
@@ -277,9 +292,9 @@ class ClienteComercio {
 	for (Pedido x: p){
 		if(u.obtenerNombre().equals(x.obtenerUsuario().obtenerNombre())){
 		    numPedido++;
-		    System.out.println("PEDIDO NUMERO "+ numPedido);
+		    System.out.println("ID PEDIDO: "+ x.obtenerId());
 		    System.out.println("Realizado por: "+ u.obtenerNombre());
-		    System.out.println("Fecha: " + x.obtenerFecha() + "  Id: "+ x.obtenerId());
+		    System.out.println("Fecha: " + x.obtenerFecha());
 		    System.out.println("Dirección de envío: "+ x.obtenerDireccion());
 		    System.out.println("Productos: ");
 		    pro=x.obtenerCarrito();
@@ -361,7 +376,6 @@ class ClienteComercio {
 			System.out.println("--------------------------------");
 			System.out.println("Precio total: "+precio_total+" €");
 			System.out.println("Pedido realizado correctamente");
-			srv.guardarCambios();
 		}
 	    }catch (RemoteException e) {
 		System.err.println("Error de comunicacion: " + e.toString());
@@ -382,12 +396,10 @@ class ClienteComercio {
 		flag4 = 0;
 		}catch(InputMismatchException e){
 			System.out.println("Error introduciendo datos"); 
-			//sc.next();
 		}
 	}while(flag4==1);
 	nuevoSaldo=u.añadirSaldo(aux);
 	System.out.println(" \n Nuevo saldo: "+ nuevoSaldo+" € ");
-
     }
 
     public static void modificarUsuario(Usuario usuario, OrderSL srv){
@@ -416,13 +428,14 @@ class ClienteComercio {
 	    System.out.println("-------------------------------------");
 	    switch(i){
 	    case 1:
-		System.out.println("Introduzca nuevo nombre de usuario: ");
 		flag4=1;				
 		do{
+		System.out.println("Introduzca nuevo nombre de usuario: ");
 		try{
 		Scanner sc = new Scanner(System.in);
 		nombre = sc.nextLine();
-		flag4 = 0;
+		if(nombre.length()!=0)
+			flag4 = 0;
 		}catch(InputMismatchException e){
 			System.out.println("Error introduciendo datos"); 
 		}
@@ -440,13 +453,14 @@ class ClienteComercio {
 		usuario.cambiarNombre(nombre);
 		break;
 	    case 2:
-		System.out.println("Introduzca nueva contraseña: ");
 		flag4=1;				
 		do{
+		System.out.println("Introduzca nueva contraseña: ");
 		try{
 		Console console = System.console();
 		 password = new String(console.readPassword());
-		flag4 = 0;
+		if(password.length()!=0)
+			flag4 = 0;
 		}catch(InputMismatchException e){
 			System.out.println("Error introduciendo datos"); 
 		}
@@ -454,13 +468,14 @@ class ClienteComercio {
 		usuario.cambiarContraseña(password);
 		break;
 	    case 3:
-		System.out.println("Introduzca nueva direccion: ");
 		flag4=1;				
 		do{
+		System.out.println("Introduzca nueva direccion: ");
 		try{
 		Scanner sc = new Scanner(System.in);
 		direccion = sc.nextLine();
-		flag4 = 0;
+		if(direccion.length()!=0)
+			flag4 = 0;
 		}catch(InputMismatchException e){
 			System.out.println("Error introduciendo datos"); 
 		}
@@ -483,12 +498,13 @@ class ClienteComercio {
 	String nombre="";
 	float precio=0;
 	boolean existe=false;
-	    System.out.println("Nombre del producto a añadir: ");
 	do{
+		System.out.println("Nombre del producto a añadir: ");
 		try{
 		Scanner sc = new Scanner(System.in);
 		nombre = sc.nextLine();
-		flag4 = 0;
+		if(nombre.length()!=0)
+			flag4 = 0;
 		}catch(InputMismatchException e){
 			System.out.println("Error introduciendo datos"); 
 		}
@@ -502,9 +518,9 @@ class ClienteComercio {
 			System.out.println("Excepción comprobando si existe el producto");		
 		}
 	}while(flag4==1);
-	    System.out.println("Precio del producto a añadir: ");
 	flag4=1;    
 	do{
+	    	System.out.println("Precio del producto a añadir: ");		
 		try{
 		Scanner sc = new Scanner(System.in);
 		precio = sc.nextFloat();

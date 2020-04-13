@@ -42,11 +42,6 @@ class Usuario implements Serializable {
 	public void cambiarDireccion(String nueva) {
 		this.direccion = nueva;
 	}
-	public Usuario hacerAdmin(boolean admin_nuevo){
-		this.admin=admin_nuevo;
-		return this;	
-		
-	}
 	public float añadirSaldo(float valor) {
         	this.saldo+=valor;
         	return this.saldo;
