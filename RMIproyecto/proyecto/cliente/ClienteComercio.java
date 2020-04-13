@@ -7,6 +7,7 @@ import java.io.*;
 
 
 class ClienteComercio {
+	//Constantes que utilizaremos para saber qué acción del menú quiere realizar el cliente
     public static final int COMPROBAR_PEDIDOS = 1;
     public static final int MOSTRAR_CATÁLOGO = 2;
     public static final int REALIZAR_PEDIDO = 3;
@@ -18,9 +19,9 @@ class ClienteComercio {
     
     static public void main (String args[]) {
 
-	boolean existe = false;
-	boolean administrador = false;
-	Usuario usuario = null;
+	boolean existe = false; //Boolean que modificaremos dependiendo de si el nombre de usuario existe o no
+	boolean administrador = false; //Boolean que indicará si el usuario es administrador o no
+	Usuario usuario = null; //Declaramos el objeto usuario para mas tarde usarlo
 	int flag = 1; //Bandera para la salida del menu
 	int flag2 = 1; //Bandera para la salida de creación de usuario e inicio de sesion
 	int flag3 = 0; //Bandera para la salida de la concesión de administrador al usuario
@@ -28,14 +29,14 @@ class ClienteComercio {
 	int numPedidos=0;
 	int aux=0;
 	List <Producto> catalogo;//Lista en la que guardaremos los objetos de la clase Producto
-	List <Usuario> Usuarios;
-	String nomUsu="";
+	List <Usuario> Usuarios;//Lista en la que guardaremos los objetos de tipo usuario que hay en el servidor
+	String nomUsu=""; //Declaramos e inicializamos las variables que necesitaremos
 	String password="";
 	String direccion="";
 	float saldoIni=0;
 	int i=0;
-	Scanner sc = new Scanner(System.in);
-        if (args.length!=2) {
+	Scanner sc = new Scanner(System.in); //Objeto de la clase Scanner con el que capturaremos la entrada por teclado
+        if (args.length!=2) { //Comprobamos que el cliente ha introducido la cantidad de argumentos necesarios
             System.err.println("Uso: ClienteComercio hostregistro numPuertoRegistro");
             return;
         }
@@ -44,9 +45,11 @@ class ClienteComercio {
             System.setSecurityManager(new SecurityManager());
 
         try {
-            OrderSL srv = (OrderSL) Naming.lookup("//" + args[0] + ":" + args[1] + "/OrderSL");
+		//Obtenemos del servidor un objeto de la clase OrderSL.
+            OrderSL srv = (OrderSL) Naming.lookup("//" + args[0] + ":" + args[1] + "/OrderSL"); 
 	    clear();
-	    while(flag2 == 1){
+		
+	    while(flag2 == 1){ 
 		do{
 			System.out.println("Introduzca nombre de usuario: ");
 		    flag4 = 1;
