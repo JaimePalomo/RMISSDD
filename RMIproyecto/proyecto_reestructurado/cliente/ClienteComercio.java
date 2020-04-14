@@ -307,6 +307,7 @@ class ClienteComercio {
 	List <Pedido> p;
 	try{
 	    p=srv.obtenerPedidos();
+		//Recorremos con un for todos los pedidos e imprimimos los datos de los que sean del usuario pasado como parametro
 	    for (Pedido x: p){
 		if(u.obtenerNombre().equals(x.obtenerUsuario().obtenerNombre())){
 		    numPedido++;
@@ -330,8 +331,8 @@ class ClienteComercio {
     }
 
     
-    public static Usuario realizarPedido(Usuario u, List <Producto> catalogo, OrderSL srv){ //Esta función le pasará al servidor un array de int con las id de los productos que quiere pedir
-	Usuario usuario=u;
+    public static Usuario realizarPedido(Usuario u, List <Producto> catalogo, OrderSL srv){ //Esta función le pasará al servidor un array de int con las id de los productos que quiere pedir el cliente
+	Usuario usuario=u; //Este objeto usuario será el que se devuelva al main para que el cliente tenga el usuario actualizado 
 	int flag = 0;
 	int listaProductos[]= new int[100];
 	int aux=0;
@@ -340,6 +341,7 @@ class ClienteComercio {
 	int flag4 = 1;
 	float precio_total = 0;
 	boolean cancelado = false;
+	    //Imprimimos el catalogo
 	for(Producto z: catalogo){
 	    System.out.println(z.obtenerNombre() + "	precio: " + z.obtenerPrecio() +" €	id: " + z.obtenerId()); 
 	}
@@ -386,6 +388,7 @@ class ClienteComercio {
 	    }
 	}
 	if(listaProductos[0]!=0 ){
+		//Si el precio del pedido supera el saldo del usuario el pedido se cancelará automáticamente
 	    try{
 		if (precio_total>srv.obtenerSaldo(u.obtenerNombre()) && cancelado==false){
 		    System.out.println("Saldo insuficiente");
@@ -393,6 +396,7 @@ class ClienteComercio {
 		}
 		if(!cancelado){
 		    srv.realizarPedido(listaProductos, u);
+			//Se resta el precio del pedido del usuario de la base de datos del servidor y se obtiene el usuario actualizado
 		    usuario=srv.añadirSaldo(u.obtenerNombre(), -precio_total);
 		    System.out.println("--------------------------------");
 		    System.out.println("Precio total: "+precio_total+" €");
@@ -404,7 +408,7 @@ class ClienteComercio {
 	}
 	return usuario;
     }
-
+	//Esta función llama al servidor para que sume el saldo que quiera añadir el cliente y obtiene el usuario actualizado
     public static Usuario añadirSaldo(String nombreUsu, OrderSL srv){
 	Usuario usuario=null;
 	float nuevoSaldo; 
@@ -426,6 +430,7 @@ class ClienteComercio {
 	    }
 	}while(flag4==1);
 	try{
+	//Se añade el saldo en el servidor y se obtiene el usuario actualizado	
 	usuario=srv.añadirSaldo(nombreUsu,aux);
 	System.out.println(" \n Nuevo saldo: "+ usuario.obtenerSaldo()+" € ");
 	}catch(RemoteException e){
@@ -433,7 +438,8 @@ class ClienteComercio {
 	}
 	return usuario;
     }
-
+	//Esta función llamará alservidor para que cambie en el usuario de la BD el nombre, la contraseña o la direccion
+	// y nos lo devuelva actualizado
     public static Usuario modificarUsuario(String nomUsu, OrderSL srv){
 	Usuario usuario=null;
 	int flag = 1;
@@ -484,7 +490,7 @@ class ClienteComercio {
 			
 		}while(flag4==1);
 		try{
-		    usuario=srv.cambiarNombre(nomUsu,nombre);
+		    usuario=srv.cambiarNombre(nomUsu,nombre); //Le cambiamos el nombre en el servidor y obtenemos el usuario actualizado
 		}catch(RemoteException e){
 		    System.err.println("Error de comunicacion: " + e.toString()); 
 		}
@@ -503,7 +509,7 @@ class ClienteComercio {
 		    }
 		}while(flag4==1);
 		try{
-		    usuario=srv.cambiarContraseña(nomUsu,password);
+		    usuario=srv.cambiarContraseña(nomUsu,password);//Le cambiamos la contraseña en el servidor y obtenemos el usuario actualizado
 		}catch(RemoteException e){
 		    System.err.println("Error de comunicacion: " + e.toString());
 		}
@@ -522,7 +528,7 @@ class ClienteComercio {
 		    }
 		}while(flag4==1);
 		try{
-		usuario=srv.cambiarDireccion(nomUsu,direccion);
+		usuario=srv.cambiarDireccion(nomUsu,direccion); //Le cambiamos la direccion en el servidor y obtenemos el usuario actualizado
 		}catch(RemoteException e){
 		System.err.println("Error de comunicacion: " + e.toString());
 	    }
@@ -537,7 +543,7 @@ class ClienteComercio {
 	}
 	return usuario;
     }
-
+	//Esta funcion añadira un producto al catalogo del servidor
     public static void añadirProducto(OrderSL srv){
 	int flag4=1;
 	int flag2=1;
