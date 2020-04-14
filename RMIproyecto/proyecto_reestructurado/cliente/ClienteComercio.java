@@ -234,27 +234,24 @@ class ClienteComercio {
 		    break;
 		case REALIZAR_PEDIDO:
 		    clear();
-		    String nombre_usuario = usuario.obtenerNombre();
-		    usuario=realizarPedido(usuario, catalogo, srv); 
-		    // srv.modificarUsuario(usuario, nombre_usuario);    //Avisamos al servidor de que modifique el usuario en su BBDD
-		    Thread.sleep(3000);                              //dado que hemos realizado cambios en su saldo
+		    usuario=realizarPedido(usuario, catalogo, srv); //Realizamos un pedido y devolvemos el usuario
+		    Thread.sleep(3000);                       
 		    clear();
 		    break;
 		case MODIFICAR_DATOS_USUARIO:
 		    clear();
-		    String nombre_usuario1= usuario.obtenerNombre();
-		    usuario=modificarUsuario(nombre_usuario1, srv); //Modifica los datos del usuario en el cliente
-		    // srv.modificarUsuario(usuario, nombre_usuario_antiguo); //Avisa al servidor para que modifique el usuario en su BBDD
+		    nomUsu= usuario.obtenerNombre();
+		    usuario=modificarUsuario(nomUsu, srv); //Modifica los datos del usuario en el cliente
+		    srv.modificarPedido(usuario, nomUsu); //Modifica los pedidos del usuario por si se ha cambiado el nombre
 		    clear();
 		    System.out.println("Datos de usuario modificados correctamente");
 		    break;
 		case AÑADIR_SALDO:
 		    clear();
 		    usuario=srv.iniciarSesion(usuario.obtenerNombre(), usuario.obtenerContraseña()); //Obtenemos el usuario actualizado
-		    String nombre_usuario2 = usuario.obtenerNombre();                                       //por si se ha realizado algún cambio desde
-		    usuario=añadirSaldo(nombre_usuario2,srv);                                                          //otra máquina
-		    // srv.modificarUsuario(usuario, usuario.obtenerNombre());  //Avisamos al servidor de que modifique el usuario en su BBDD
-		    Thread.sleep(3000);                              //dado que hemos realizado cambios en su saldo
+		    nomUsu = usuario.obtenerNombre();                                       //por si se ha realizado algún cambio desde
+		    usuario=añadirSaldo(nomUsu,srv);                                       //otra máquina
+		    Thread.sleep(3000);
 		    clear();
 		    break;
 		case AÑADIR_PRODUCTO:

@@ -11,6 +11,7 @@ interface OrderSL extends Remote {
     void crearProducto(String nombre, float precio) throws RemoteException;
     void realizarPedido(int listaProductos[], Usuario usuario) throws RemoteException;
     Usuario iniciarSesion(String nombre, String contraseña) throws RemoteException;
+    void leerDatosBBDD() throws RemoteException;
     void escribirDatosBBDD() throws RemoteException;
     boolean existeUsuario(String nombre) throws RemoteException;
     boolean existeProducto(String nombre) throws RemoteException;
@@ -22,5 +23,5 @@ interface OrderSL extends Remote {
     Usuario cambiarDireccion(String nomUsu, String nueva_direccion)  throws RemoteException;
     Usuario cambiarContraseña(String nomUsu, String nueva_contraseña)  throws RemoteException;
     float obtenerSaldo(String nomUsu)  throws RemoteException;
-    void modificarUsuario(Usuario usuario_nuevo, String nombre_usuario_antiguo) throws RemoteException;
+    void modificarPedido(Usuario usuario_nuevo, String nombre_usuario_antiguo) throws RemoteException;
 }

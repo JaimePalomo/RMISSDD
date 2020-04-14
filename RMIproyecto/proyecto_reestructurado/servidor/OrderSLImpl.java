@@ -11,40 +11,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Usuarios = new LinkedList<Usuario>();  //Inicializamos las listas de objetos
        	Productos = new LinkedList<Producto>();
 	Pedidos = new LinkedList<Pedido>();
-	
-	File archivo_usuario = new File("Usuarios.dat");
-	File archivo_producto = new File("Productos.dat");	  //Abrimos los ficheros .dat (BBDD) donde tenemos guardados los datos
-	File archivo_pedido = new File("Pedidos.dat");
-				
-	if (archivo_usuario.length()!=0){
-		try{
-		ObjectInputStream usu_entrada = new ObjectInputStream(new FileInputStream("Usuarios.dat")); //Leemos todos los .dat y los guardamos 
-		Usuarios = (List <Usuario>) usu_entrada.readObject();   //en listas de objetos, pero solo si no están vacíos
-		usu_entrada.close(); 
-	}catch(Exception e){
-		System.out.println(e);
-	}	
-	}
-	if (archivo_producto.length()!=0){
-		try{
-		ObjectInputStream pro_entrada = new ObjectInputStream(new FileInputStream("Productos.dat"));
-		Productos = (List <Producto>) pro_entrada.readObject();
-		pro_entrada.close();
-	}catch(Exception e){
-		System.out.println(e);
-	}	
-	}
-	if (archivo_pedido.length()!=0){
-		try{
-		ObjectInputStream ped_entrada = new ObjectInputStream(new FileInputStream("Pedidos.dat"));
-		Pedidos = (List <Pedido>) ped_entrada.readObject();
-		ped_entrada.close(); 
-	}catch(Exception e){
-		System.out.println(e);
-	}	
-	}
-	
-	
+	leerDatosBBDD();
      }
         public Usuario crearUsuario(String nombre, String contraseña, float saldo, String direccion, boolean admin) throws RemoteException { 
 	Usuario usuario = new Usuario(nombre,contraseña,saldo, direccion, admin);  //Crea el usuario y devuelve el objeto
@@ -106,6 +73,41 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
             }
         return usuario;
 	}
+	public void leerDatosBBDD() throws RemoteException { //Lee los datos de los ficheros .dat
+	
+	File archivo_usuario = new File("Usuarios.dat");
+	File archivo_producto = new File("Productos.dat");	  //Abrimos los ficheros .dat (BBDD) donde tenemos guardados los datos
+	File archivo_pedido = new File("Pedidos.dat");
+				
+	if (archivo_usuario.length()!=0){
+		try{
+		ObjectInputStream usu_entrada = new ObjectInputStream(new FileInputStream("Usuarios.dat")); //Leemos todos los .dat y los guardamos 
+		Usuarios = (List <Usuario>) usu_entrada.readObject();   //en listas de objetos, pero solo si no están vacíos
+		usu_entrada.close(); 
+	}catch(Exception e){
+		System.out.println(e);
+	}	
+	}
+	if (archivo_producto.length()!=0){
+		try{
+		ObjectInputStream pro_entrada = new ObjectInputStream(new FileInputStream("Productos.dat"));
+		Productos = (List <Producto>) pro_entrada.readObject();
+		pro_entrada.close();
+	}catch(Exception e){
+		System.out.println(e);
+	}	
+	}
+	if (archivo_pedido.length()!=0){
+		try{
+		ObjectInputStream ped_entrada = new ObjectInputStream(new FileInputStream("Pedidos.dat"));
+		Pedidos = (List <Pedido>) ped_entrada.readObject();
+		ped_entrada.close(); 
+	}catch(Exception e){
+		System.out.println(e);
+	}	
+	}	
+	}
+
 	public void escribirDatosBBDD() throws RemoteException { //Guarda las listas de objetos actuales en la BBDD para no perder los datos
 	
 	File usu_borrar = new File ("Usuarios.dat");
@@ -166,7 +168,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Iterator<Usuario> recorrer_usuarios = Usuarios.iterator();
 	Usuario usuario=null;
 	boolean flag=true;
-	while (recorrer_usuarios.hasNext() && flag==true){                                             //los atributos de usuario_nuevo
+	while (recorrer_usuarios.hasNext() && flag==true){                                            
 	    usuario = recorrer_usuarios.next(); 
 	    if (usuario.obtenerNombre().equals(nomUsu)){
 		usuario.añadirSaldo(dinero);
@@ -180,7 +182,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Iterator<Usuario> recorrer_usuarios = Usuarios.iterator();
 	Usuario usuario=null;
 	boolean flag=true;
-	while (recorrer_usuarios.hasNext() && flag==true){                                             //los atributos de usuario_nuevo
+	while (recorrer_usuarios.hasNext() && flag==true){                                 
 	    usuario = recorrer_usuarios.next(); 
 	    if (usuario.obtenerNombre().equals(nomUsu)){
 		usuario.cambiarNombre(nuevo_nombre);
@@ -194,7 +196,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Iterator<Usuario> recorrer_usuarios = Usuarios.iterator();
 	Usuario usuario=null;
 	boolean flag=true;
-	while (recorrer_usuarios.hasNext() && flag==true){                                             //los atributos de usuario_nuevo
+	while (recorrer_usuarios.hasNext() && flag==true){                                          
 	    usuario = recorrer_usuarios.next(); 
 	    if (usuario.obtenerNombre().equals(nomUsu)){
 		usuario.cambiarDireccion(nueva_direccion);
@@ -208,7 +210,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Iterator<Usuario> recorrer_usuarios = Usuarios.iterator();
 	Usuario usuario=null;
 	boolean flag=true;
-	while (recorrer_usuarios.hasNext() && flag==true){                                             //los atributos de usuario_nuevo
+	while (recorrer_usuarios.hasNext() && flag==true){                                          
 	    usuario = recorrer_usuarios.next(); 
 	    if (usuario.obtenerNombre().equals(nomUsu)){
 		usuario.cambiarContraseña(nueva_contraseña);
@@ -223,7 +225,7 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	Usuario usuario=null;
 	boolean flag=true;
 	float saldo=0;
-	while (recorrer_usuarios.hasNext() && flag==true){                                             //los atributos de usuario_nuevo
+	while (recorrer_usuarios.hasNext() && flag==true){                                         
 	    usuario = recorrer_usuarios.next(); 
 	    if (usuario.obtenerNombre().equals(nomUsu)){
 		saldo=usuario.obtenerSaldo();
@@ -233,18 +235,11 @@ class OrderSLImpl extends UnicastRemoteObject implements OrderSL {
 	return saldo;
     }
     
-	public void modificarUsuario(Usuario usuario_nuevo, String nombre_usuario_antiguo){ //Esta funcion busca en la lista de usuarios una 
-	Iterator<Usuario> recorrer_usuarios = Usuarios.iterator();                         //coincidencia con nombre_usuario_antiguo y elimina dicho 
-	Iterator<Pedido> recorrer_pedidos = Pedidos.iterator();                           //usuario, después añade a la lista un nuevo usuario con 
-    	while (recorrer_usuarios.hasNext()){                                             //los atributos de usuario_nuevo
-		Usuario usuario = recorrer_usuarios.next(); 
-		if (usuario.obtenerNombre().equals(nombre_usuario_antiguo))
-			recorrer_usuarios.remove();
-	}
-   	Usuarios.add(usuario_nuevo); 	
-	while (recorrer_pedidos.hasNext()){   //También busca en la lista de Pedidos si el usuario antiguo tenía pedidos realizados
+	public void modificarPedido(Usuario usuario_nuevo, String nombre_usuario_antiguo){ //Esta funcion busca en la lista de pedidos una
+	Iterator<Pedido> recorrer_pedidos = Pedidos.iterator();   //coincidencia con nombre_usuario_antiguo y lo cambia por el nuevo
+	while (recorrer_pedidos.hasNext()){
 	      Pedido pedido = recorrer_pedidos.next();
-	      if (pedido.obtenerUsuario().obtenerNombre().equals(nombre_usuario_antiguo))  // y lo cambia por el nuevo
+	      if (pedido.obtenerUsuario().obtenerNombre().equals(nombre_usuario_antiguo))
 			pedido.cambiarUsuario(usuario_nuevo);
 	}
     }
